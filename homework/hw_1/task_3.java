@@ -67,6 +67,3 @@ public class task_3 {
         return newArr;
     }
 }
-
-git commit-m'change code task_3 hw_1
-'
