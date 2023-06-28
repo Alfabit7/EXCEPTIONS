@@ -56,9 +56,17 @@ public class task_3 {
         } else {
             System.out.println();
             for (int i = 0; i < arr_1.length; i++) {
+                try {
+                    newArr[i] = arr_1[i] / arr_2[i];
+                } catch (ArithmeticException e) {
+                    System.out.println("Арифметическая ошибка");
+                }
                 newArr[i] = arr_1[i] / arr_2[i];
             }
         }
         return newArr;
     }
 }
+
+git commit-m'change code task_3 hw_1
+'
