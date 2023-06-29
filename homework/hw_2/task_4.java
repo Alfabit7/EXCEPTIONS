@@ -18,6 +18,7 @@ public class task_4 {
     static String checkedInputUser() throws myException {
         String res = null;
         Scanner sc = new Scanner(System.in);
+
         while (res == null || res.trim().isEmpty()) {
             try {
                 res = sc.nextLine();
