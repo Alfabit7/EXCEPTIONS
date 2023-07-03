@@ -35,8 +35,6 @@ public class final_work {
 
             } else {
                 System.out.println();
-                System.out.println("Повторите ввод");
-                strDataUser = requestDataUser();
             }
 
         } while (!checkedElementArray(arrDataUser));
