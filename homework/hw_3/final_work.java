@@ -1,5 +1,7 @@
 package hw_3;
 
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Scanner;
 
 import javax.print.DocFlavor.STRING;
@@ -38,6 +40,10 @@ public class final_work {
             }
 
         } while (!checkedElementArray(arrDataUser));
+
+        // Функция записи введеных пользователем данных в файл
+        writeTofile(arrDataUser);
+
     }
 
     // Метод запрашивает ввод данных у пользователя
@@ -92,33 +98,14 @@ public class final_work {
         }
     }
 
-}
+    static public void writeTofile(String[] arrDataUser) {
+        try (FileWriter writer = new FileWriter("baseUsers.txt")) {
+            for (String str : arrDataUser) {
+                writer.write(str + System.lineSeparator());
+            }
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
 
-/*
- * Проверка на наличие только букв русского и английского афавита
- * class Main
- * {
- * public static boolean isAlpha(String s)
- * {
- * if (s == null) {
- * return false;
- * }
- * 
- * for (int i = 0; i < s.length(); i++)
- * {
- * char c = s.charAt(i);
- * if (!(c >= 'A' && c <= 'Z') && !(c >= 'a' && c <= 'z') && !(c >= 'А' && c <=
- * 'Я') && !(c >= 'а' && c <= 'я')) {
- * return false;
- * }
- * }
- * return true;
- * }
- * 
- * public static void main(String[] args)
- * {
- * String s = "БяABCD";
- * System.out.println("IsAlpha: " + isAlpha(s));
- * }
- * }
- */
+}
