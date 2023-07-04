@@ -17,50 +17,81 @@ public class final_work {
     static String uniqueID; // id юзеров
     static String date; // дата создания
     static String[] resArrDataUser = new String[6]; // результирующий массив в котором будет id дата создания
+    static Boolean exit = true;
+    static String strDataUser;
 
     public static void main(String[] args) throws checkedInput {
+        // метод menu зацикливает запрос ввода данных пользователем если пользователь
+        // введ q работа программы прекращается
+        while (exit) {
+            menu();
+        }
+
+    }
+
+    public static String menu() {
         // requestDataUser запрашиваем ввод данных у пользователя в строку
         do {
-            String strDataUser = requestDataUser();
-            // convertStrToArr Преобразуем строку в массив
-            arrDataUser = convertStrToArr(strDataUser);
+            strDataUser = requestDataUser();
+            // Если пользователь ввёл q или Q, то прекращаем работу программы
 
+            // DRY
+            if (strDataUser.equalsIgnoreCase("Q") || strDataUser.equalsIgnoreCase("q")) {
+                exit = false; // условие выхода из while в методе main
+                return "Q";
+            }
+            // метод convertStrToArr преобразует строку в массив
+            arrDataUser = convertStrToArr(strDataUser);
             // Проверяем что массив arrDataUser не меньше и небольше 4 элементов ФИО и номер
-            // телефона
+            // телефона если нет перезапускаем метод запроса ввода данных requestDataUser
             while (arrDataUser.length != 4) {
                 System.out.println();
                 System.out.println("Введено больше или меньше четырёх строк, повторите ввод!");
                 strDataUser = requestDataUser();
+
+                // DRY
+                if (strDataUser.equalsIgnoreCase("Q") || strDataUser.equalsIgnoreCase("q")) {
+                    exit = false; // условие выхода из while в методе main
+                    return "Q";
+                }
                 arrDataUser = convertStrToArr(strDataUser);
             }
-
             System.out.println();
-            // Функция checkedElementArray проверят валидность данных в массиве boolean type
+
+            // Функция checkedElementArray проверят валидность данных в массиве и возвращает
+            // boolean type
         } while (!checkedElementArray(arrDataUser));
+
         // Если данные валидны создаем id и дату создания пользователя и добавляем в
-        // массив
+        // новый массив resArrDataUser
         uniqueID = UUID.randomUUID().toString();
         date = LocalDateTime.now()
                 .toString();
+        // Записываем даннные из старого массива в новый
         for (int i = 0; i < arrDataUser.length; i++) {
             resArrDataUser[i] = arrDataUser[i];
         }
+        // Добавляем id и дату
         resArrDataUser[4] = uniqueID;
         resArrDataUser[5] = date;
         // Функция записи введеных пользователем данных в файл
         writeTofile(resArrDataUser);
+        return "Файл сохранен";
     }
 
-    // Метод запрашивает ввод данных у пользователя
+    // Метод requestDataUser запрашивает ввод данных у пользователя
     static public String requestDataUser() {
-        System.out.print("Введите Фамилию Имя Отчество и номер телефона через пробел: ");
+        System.out.print("Введите Фамилию Имя Отчество и номер телефона через пробел. Для выхода нажмите Q или q: ");
         String str = null;
         while (str == null || str.trim().isEmpty()) {
+            // пока строка пустая или содержит пробелы будем выбрасывать собственное
+            // исключение checkedInput
             try {
                 str = sc.nextLine();
                 if (str.trim().isEmpty()) {
                     throw new checkedInput("Вы не ввели данных!");
                 }
+
             } catch (checkedInput e) {
                 System.out.println(e.getMessage());
                 System.out.print("Повторите ввод! Введите Фамилию Имя Отчество и номер телефона через пробел: ");
@@ -76,7 +107,8 @@ public class final_work {
     }
 
     static public String[] convertStrToArr(String strDataUser) {
-        // Функция конвертирует строку в массив на 4 элемента ФИО и номер тел.
+        // Функция конвертирует строку введеную пользователем в массив на 4 элемента ФИО
+        // и номер тел.
         arrDataUser = strDataUser.split(" ");
         return arrDataUser;
     }
@@ -84,17 +116,17 @@ public class final_work {
     // Проверка валидности данных - что первые три элемента это строка, а четвертый
     // это 11-ть цифр
     static public boolean checkedElementArray(String[] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            if (arr[0].matches("[a-zA-ZА-яЁё]+") && arr[1].matches("[a-zA-ZА-яЁё]+")
-                    && arr[2].matches("[a-zA-ZА-яЁё]+") && arr[3].matches("^((\\+7|7|8)+([0-9]){10})$")) {
-                System.out.println("Данные корректны и будут сохранены");
-                return true;
-            } else {
-                System.out.println(
-                        "Строки ФИО не могут содержать цифры, а номер телефона нужно вводить в формате 89112223344");
-                return false;
-            }
+        // for (int i = 0; i < arr.length; i++) {
+        if (arr[0].matches("[a-zA-ZА-яЁё]+") && arr[1].matches("[a-zA-ZА-яЁё]+")
+                && arr[2].matches("[a-zA-ZА-яЁё]+") && arr[3].matches("^((\\+7|7|8)+([0-9]){10})$")) {
+            // return true;
+        } else {
+            System.out.println(
+                    "Строки ФИО не могут содержать цифры, а номер телефона нужно вводить в формате 89112223344");
+            return false;
         }
+        // }
+        System.out.println("Данные корректны и будут сохранены");
         return true;
     }
 
@@ -109,7 +141,8 @@ public class final_work {
     static public void writeTofile(String[] arrDataUser) {
         boolean fileExists = new File("baseUsers.csv").exists();
         try (FileWriter writer = new FileWriter("baseUsers.csv", true)) {// true чтобы дозаписывать файл
-            String[] columnNames = { "Surname", "Name", "Lastname", "ID", "Phone_number", "Date" };
+            String[] columnNames = { "Surname", "Name", "Lastname", "ID", "Phone_number", "Date" };// Названия столбцов
+                                                                                                   // в файле csv
 
             if (!fileExists) {
                 StringBuilder sb = new StringBuilder();
