@@ -3,13 +3,11 @@ package hw_3;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Date;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class final_work {
     static Scanner sc = new Scanner(System.in);
@@ -26,7 +24,6 @@ public class final_work {
         while (exit) {
             menu();
         }
-
     }
 
     public static String menu() {
@@ -116,18 +113,43 @@ public class final_work {
     // Проверка валидности данных - что первые три элемента это строка, а четвертый
     // это 11-ть цифр
     static public boolean checkedElementArray(String[] arr) {
-        // for (int i = 0; i < arr.length; i++) {
-        if (arr[0].matches("[a-zA-ZА-яЁё]+") && arr[1].matches("[a-zA-ZА-яЁё]+")
-                && arr[2].matches("[a-zA-ZА-яЁё]+") && arr[3].matches("^((\\+7|7|8)+([0-9]){10})$")) {
-            // return true;
+
+        /*
+         * // 'эта регулярка Кирилицу не проверяет
+         * if (arr[0].matches("^[\\p{L}]+$") && arr[1].matches("^[\\p{L}]+$")
+         * && arr[2].matches("^[\\p{L}]+$") &&
+         * arr[3].matches("^((\\+7|7|8)+([0-9]){10})$")) {
+         * } else {
+         * System.out.println(
+         * "Строки ФИО не могут содержать цифры, а номер телефона нужно вводить в
+         * формате 89112223344");
+         * return false;
+         * }
+         * System.out.println("Данные корректны и будут сохранены");
+         * return true;
+         */
+
+        String regex = "^[a-zA-Zа-яА-Я]+$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(arr[0]);
+        Matcher matcher1 = pattern.matcher(arr[1]);
+        Matcher matcher2 = pattern.matcher(arr[2]);
+        if (matcher.find() && matcher1.find() && matcher2.find() && arr[3].matches("^((\\+7|7|8)+([0-9]){10})$")) {
+            // Проверка для русских символов
+            System.out.println("Данные корректны и будут сохранены");
+            return true;
         } else {
-            System.out.println(
-                    "Строки ФИО не могут содержать цифры, а номер телефона нужно вводить в формате 89112223344");
-            return false;
+            // Проверка для английских символов
+            if (!matcher.find() && !matcher1.find() && !matcher2.find()
+                    && arr[3].matches("^((\\+7|7|8)+([0-9]){10})$")) {
+                System.out.println("Данные корректны и будут сохранены");
+                return true;
+            }
         }
-        // }
-        System.out.println("Данные корректны и будут сохранены");
-        return true;
+
+        System.out.println(
+                "Строки ФИО не могут содержать цифры, а номер телефона нужно вводить в формате 89112223344");
+        return false;
     }
 
     // Исключение - проверка, что строка не пустая или не введены пробелы +
