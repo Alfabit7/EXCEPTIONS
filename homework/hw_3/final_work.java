@@ -1,16 +1,22 @@
 package hw_3;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Scanner;
 import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.nio.charset.StandardCharsets;
 
 public class final_work {
-    static Scanner sc = new Scanner(System.in);
+    static Scanner sc = new Scanner(System.in, "cp866");
     static String[] arrDataUser; // в массив записываются данные которые вводит пользователь
     static String uniqueID; // id юзеров
     static String date; // дата создания
@@ -114,42 +120,46 @@ public class final_work {
     // это 11-ть цифр
     static public boolean checkedElementArray(String[] arr) {
 
+        // 'эта регулярка Кирилицу не проверяет
+        if (arr[0].matches("^[\\p{L}]+$") && arr[1].matches("^[\\p{L}]+$")
+                && arr[2].matches("^[\\p{L}]+$") &&
+                arr[3].matches("^((\\+7|7|8)+([0-9]){10})$")) {
+        } else {
+            System.out.println(
+                    "Строки ФИО не могут содержать цифры, а номер телефона нужно вводить в формате 89112223344 или 79112223344");
+            return false;
+        }
+        System.out.println("Данные корректны и будут сохранены");
+        return true;
+
+        // второй метод регуляркb проверяет кирилиццу Кирилицу не проверяет
         /*
-         * // 'эта регулярка Кирилицу не проверяет
-         * if (arr[0].matches("^[\\p{L}]+$") && arr[1].matches("^[\\p{L}]+$")
-         * && arr[2].matches("^[\\p{L}]+$") &&
+         * String regex = "^[a-zA-Zа-яА-Я]+$";
+         * Pattern pattern = Pattern.compile(regex);
+         * Matcher matcher = pattern.matcher(arr[0]);
+         * Matcher matcher1 = pattern.matcher(arr[1]);
+         * Matcher matcher2 = pattern.matcher(arr[2]);
+         * if (matcher.find() && matcher1.find() && matcher2.find() &&
          * arr[3].matches("^((\\+7|7|8)+([0-9]){10})$")) {
-         * } else {
-         * System.out.println(
-         * "Строки ФИО не могут содержать цифры, а номер телефона нужно вводить в
-         * формате 89112223344");
-         * return false;
-         * }
+         * // Проверка для русских символов
          * System.out.println("Данные корректны и будут сохранены");
          * return true;
+         * } else {
+         * // Проверка для английских символов
+         * if (!matcher.find() && !matcher1.find() && !matcher2.find()
+         * && arr[3].matches("^((\\+7|7|8)+([0-9]){10})$")) {
+         * System.out.println("Данные корректны и будут сохранены");
+         * System.out.println(Charset.defaultCharset().displayName());
+         * return true;
+         * }
+         * 
+         * }
+         * 
+         * System.out.
+         * println("Строки ФИО не могут содержать цифры, а номер телефона нужно вводить в формате 89112223344"
+         * );
+         * return false;
          */
-
-        String regex = "^[a-zA-Zа-яА-Я]+$";
-        Pattern pattern = Pattern.compile(regex);
-        Matcher matcher = pattern.matcher(arr[0]);
-        Matcher matcher1 = pattern.matcher(arr[1]);
-        Matcher matcher2 = pattern.matcher(arr[2]);
-        if (matcher.find() && matcher1.find() && matcher2.find() && arr[3].matches("^((\\+7|7|8)+([0-9]){10})$")) {
-            // Проверка для русских символов
-            System.out.println("Данные корректны и будут сохранены");
-            return true;
-        } else {
-            // Проверка для английских символов
-            if (!matcher.find() && !matcher1.find() && !matcher2.find()
-                    && arr[3].matches("^((\\+7|7|8)+([0-9]){10})$")) {
-                System.out.println("Данные корректны и будут сохранены");
-                return true;
-            }
-        }
-
-        System.out.println(
-                "Строки ФИО не могут содержать цифры, а номер телефона нужно вводить в формате 89112223344");
-        return false;
     }
 
     // Исключение - проверка, что строка не пустая или не введены пробелы +
@@ -157,14 +167,15 @@ public class final_work {
         public checkedInput(String message) {
             super(message);
         }
+
     }
 
     // Функция записи в файл
     static public void writeTofile(String[] arrDataUser) {
         boolean fileExists = new File("baseUsers.csv").exists();
         try (FileWriter writer = new FileWriter("baseUsers.csv", true)) {// true чтобы дозаписывать файл
-            String[] columnNames = { "Surname", "Name", "Lastname", "ID", "Phone_number", "Date" };// Названия столбцов
-                                                                                                   // в файле csv
+            String[] columnNames = { "Surname", "Name", "Lastname", "ID", "Phone_number",
+                    "Date" };// Названия столбцов в файле csv
 
             if (!fileExists) {
                 StringBuilder sb = new StringBuilder();
@@ -197,6 +208,46 @@ public class final_work {
             System.out.println();
             System.out.println("Закройте файл и попробуйте снова");
         }
-
     }
+
+    // Второй метод слохранения в файл
+    /*
+     * 
+     * public static void writeTofile(String[] arrDataUser) {
+     * boolean fileExists = new File("baseUsers.csv").exists();
+     * 
+     * try (FileOutputStream fos = new FileOutputStream("baseUsers.csv", true);
+     * OutputStreamWriter osw = new OutputStreamWriter(fos, StandardCharsets.UTF_8);
+     * BufferedWriter writer = new BufferedWriter(osw)) {
+     * 
+     * String[] columnNames = { "Фамилия", "Имя", "Отчество", "ID",
+     * "Номер телефона", "Дата" };
+     * 
+     * if (!fileExists) {
+     * StringBuilder sb = new StringBuilder();
+     * 
+     * for (String columnName : columnNames) {
+     * sb.append(columnName).append(";");
+     * }
+     * 
+     * sb.deleteCharAt(sb.length() - 1);
+     * sb.append("\n");
+     * 
+     * writer.write(sb.toString());
+     * }
+     * 
+     * StringBuilder sb = new StringBuilder();
+     * for (String str : arrDataUser) {
+     * sb.append(str).append(";");
+     * }
+     * sb.deleteCharAt(sb.length() - 1);
+     * sb.append("\n");
+     * 
+     * writer.write(sb.toString());
+     * } catch (IOException e) {
+     * e.printStackTrace();
+     * System.out.println("Закройте файл и попробуйте снова");
+     * }
+     * }
+     */
 }
